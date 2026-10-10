@@ -31,6 +31,14 @@ test('commercial documentation has one-repository scope and no false subscriptio
   assert.doesNotMatch(docs,/up to two repositories|per organization \(one-time\)|no online checkout/i);
 });
 
+test('CI proves expected failure for actual breaking changes',()=>{
+  const flow=read('.github/workflows/ci.yml');
+  assert.match(flow,/id: breaking/);
+  assert.match(flow,/continue-on-error: true/);
+  assert.match(flow,/test "\$BREAKING_OUTCOME" = 'failure'/);
+  assert.match(flow,/r\.blockingCount!==2/);
+});
+
 test('the CLI reads generator version from package metadata at runtime',()=>{
   const cli=read('cli.mjs');
   assert.match(cli,/const VERSION = JSON\.parse\(fs\.readFileSync/);

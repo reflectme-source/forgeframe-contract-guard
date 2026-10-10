@@ -14,15 +14,30 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '24'
-      - name: Run own action against safe example and retain verified artifact
+      - name: Action passes a safe OpenAPI change and retains evidence
         uses: ./
         with:
           base: fixtures/base.yaml
           head: fixtures/safe.yaml
           evidence-dir: evidence/ci
           upload-evidence: 'true'
+      - name: Action rejects breaking OpenAPI changes
+        id: breaking
+        continue-on-error: true
+        uses: ./
+        with:
+          base: fixtures/base.yaml
+          head: fixtures/breaking.yaml
+          evidence-dir: evidence/ci-breaking
+          upload-evidence: 'false'
+      - name: Verify breaking change was rejected instead of silently accepted
+        env:
+          BREAKING_OUTCOME: ${{ steps.breaking.outcome }}
+        run: |
+          test "$BREAKING_OUTCOME" = 'failure'
+          node -e "const r=require('./evidence/ci-breaking/report.json');if(r.status!=='blocked'||r.blockingCount!==2)process.exit(1)"
       - name: Run behavioral tests
         run: npm test
-      - name: Verify evidence content
+      - name: Verify safe evidence content
         run: |
           node -e "const r=require('./evidence/ci/report.json'); if(r.status!=='passed'||r.blockingCount!==0)process.exit(1)"
