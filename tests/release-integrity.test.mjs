@@ -26,7 +26,8 @@ test('commercial documentation has one-repository scope and no false subscriptio
   const docs=read('README.md');
   assert.match(docs,/\$149 one-time/);
   assert.match(docs,/one GitHub repository with an existing OpenAPI 3\.x specification/i);
-  assert.match(docs,/secure \$149 Stripe LIVE payment link/);
+  assert.match(docs,/unique Stripe-hosted payment link for that order/);
+  assert.doesNotMatch(docs,/buy\.stripe\.com\/fZu8wR6FX4q962E81z73G00/);
   assert.match(docs,/scope and delivery schedule before paying/i);
   assert.doesNotMatch(docs,/up to two repositories|per organization \(one-time\)|no online checkout/i);
 });
