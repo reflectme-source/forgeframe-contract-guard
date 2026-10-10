@@ -102,7 +102,7 @@ See [SECURITY.md](SECURITY.md) for reporting vulnerabilities and trust boundarie
 
 For teams that prefer not to configure CI themselves, ForgeFrame Labs offers an asynchronous setup for **one GitHub repository with an existing OpenAPI 3.x specification**. The service includes the CI gate, baseline, time-limited exception policy, verification of safe and breaking changes, and a short evidence handover. There is no paid hosted dashboard or recurring software subscription.
 
-**Request confirmation of scope and delivery schedule before paying.** Start at the [Contract Guard intake page](https://reflectme-source.github.io/forgeframe-labs-site/products/contract-guard-intake.html) to prepare an email request. Do not send secrets or private specifications. After written scope acceptance, we issue a unique Stripe-hosted payment link for that order; the previously shared public checkout has been retired. See [service terms and cancellation policy](https://reflectme-source.github.io/forgeframe-labs-site/terms.html).
+**Request confirmation of scope and delivery schedule before paying.** Start at the [Contract Guard intake page](https://forgeframelabs.app/products/contract-guard-intake.html) to prepare an email request. Do not send secrets or private specifications. After written scope acceptance, we issue a unique Stripe-hosted payment link for that order; the previously shared public checkout has been retired. See [service terms and cancellation policy](https://forgeframelabs.app/terms.html).
 
 The Action is open-source and free to self-host. Payment is solely for the optional fixed-scope implementation service.
 
