@@ -1,0 +1,38 @@
+openapi: 3.1.0
+info:
+  title: Example Payments API
+  version: 1.0.0
+paths:
+  /payments:
+    get:
+      operationId: listPayments
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Payment list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payment'
+components:
+  schemas:
+    Payment:
+      type: object
+      required: [id, status]
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [pending, paid]

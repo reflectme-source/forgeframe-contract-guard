@@ -1,0 +1,71 @@
+name: 'ForgeFrame Contract Guard'
+description: 'Block breaking OpenAPI changes and generate local, hash-linked release evidence.'
+author: 'ForgeFrame Labs'
+branding:
+  icon: shield
+  color: blue
+inputs:
+  base:
+    description: 'Path to the baseline OpenAPI YAML or JSON (must exist on disk).'
+    required: true
+  head:
+    description: 'Path to the candidate OpenAPI YAML or JSON (must exist on disk).'
+    required: true
+  policy:
+    description: 'Optional local JSON policy file with time-limited exceptions.'
+    required: false
+    default: ''
+  fail-on:
+    description: 'Minimum blocking severity: ERR (default), WARN, or INFO.'
+    required: false
+    default: 'ERR'
+  evidence-dir:
+    description: 'Output directory for report.json and summary.md.'
+    required: false
+    default: 'contract-guard-evidence'
+  upload-evidence:
+    description: 'Upload report files as GitHub Actions artifacts. Opt-in only.'
+    required: false
+    default: 'false'
+runs:
+  using: 'composite'
+  steps:
+    - name: Install pinned OpenAPI engine
+      shell: bash
+      run: |
+        set -euo pipefail
+        if [[ "$RUNNER_OS" != "Linux" || "$(uname -m)" != "x86_64" ]]; then
+          echo "Contract Guard v0.1 supports only Linux x86_64 runners" >&2
+          exit 2
+        fi
+        VERSION="1.33.0"
+        ASSET="oasdiff_${VERSION}_linux_amd64.tar.gz"
+        URL="https://github.com/oasdiff/oasdiff/releases/download/v${VERSION}/${ASSET}"
+        BIN_DIR="${RUNNER_TEMP}/forgeframe-contract-guard-bin"
+        mkdir -p "$BIN_DIR"
+        curl --proto '=https' --tlsv1.2 --fail --location --retry 3 --max-time 90 "$URL" -o "${RUNNER_TEMP}/${ASSET}"
+        echo "43a4e328e2d13ba1552d760aa68d2485c75c5621f309f6ff64ae895188345247  ${RUNNER_TEMP}/${ASSET}" | sha256sum --check --status
+        tar -xzf "${RUNNER_TEMP}/${ASSET}" -C "$BIN_DIR" oasdiff
+        chmod 755 "$BIN_DIR/oasdiff"
+        echo "$BIN_DIR" >> "$GITHUB_PATH"
+    - name: Check breaking changes and write release evidence
+      shell: bash
+      env:
+        GUARD_BASE: ${{ inputs.base }}
+        GUARD_HEAD: ${{ inputs.head }}
+        GUARD_POLICY: ${{ inputs.policy }}
+        GUARD_THRESHOLD: ${{ inputs.fail-on }}
+        GUARD_OUT: ${{ inputs.evidence-dir }}
+      run: |
+        set -euo pipefail
+        args=(--base "$GUARD_BASE" --head "$GUARD_HEAD" --out "$GUARD_OUT" --fail-on "$GUARD_THRESHOLD")
+        if [[ -n "$GUARD_POLICY" ]]; then args+=(--policy "$GUARD_POLICY"); fi
+        node "$GITHUB_ACTION_PATH/cli.mjs" "${args[@]}"
+    - name: Preserve evidence
+      if: always() && inputs.upload-evidence == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: contract-guard-evidence
+        path: ${{ inputs.evidence-dir }}/
+        if-no-files-found: warn
+        retention-days: 30
