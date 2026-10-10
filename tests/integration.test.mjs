@@ -85,3 +85,30 @@ test('threshold rules are explicit', () => {
   assert.equal(report.policy.failOn, 'WARN');
   assert.equal(report.blockingCount, 2);
 });
+
+test('real calendar date required; leap-day rollover cannot create bogus waivers', () => {
+  const dir=temporary(), policy=path.join(dir,'policy.json');
+  fs.writeFileSync(policy, JSON.stringify({ failOn:'ERR', exceptions:[{
+    id:'request-parameter-became-required',
+    fingerprint:'0123456789ab',
+    reason:'Explicitly reviewed compatibility exception',
+    expires:'2027-02-30'
+  }] }));
+  const result=run(['--base', base, '--head', breaking, '--policy', policy]);
+  assert.equal(result.status,2);
+  assert.match(result.stderr,/real ISO/i);
+  fs.rmSync(dir,{recursive:true,force:true});
+});
+test('untrusted ambient oasdiff configuration cannot silently override rules', () => {
+  const dir=temporary(), out=path.join(dir,'out');
+  fs.writeFileSync(path.join(dir,'.oasdiff.yaml'),'not: a valid config for compatibility rules\n');
+  const result=spawnSync(process.execPath,[cli,'--base',base,'--head',breaking,'--out',out],{
+    cwd:dir,encoding:'utf8',timeout:15000,
+    env:{...process.env,OASDIFF_CONFIG:path.join(dir,'missing-config.yaml'),OASDIFF_BIN:engine}
+  });
+  assert.equal(result.status,1,'Expected two blocking findings despite ambient config: '+result.stderr);
+  const report=JSON.parse(fs.readFileSync(path.join(out,'report.json'),'utf8'));
+  assert.equal(report.blockingCount,2);
+  assert.match(report.generator.engineVersion,/oasdiff version 1\.33\.0/);
+  fs.rmSync(dir,{recursive:true,force:true});
+});

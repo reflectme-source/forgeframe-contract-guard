@@ -10,7 +10,7 @@ import os from 'node:os';
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 
-const VERSION = '0.1.0';
+const VERSION = '0.1.1';
 const MAX_INPUT = 5 * 1024 * 1024;
 const MAX_OUTPUT = 16 * 1024 * 1024;
 const LEVEL = Object.freeze({ INFO: 1, WARN: 2, ERR: 3 });
@@ -63,7 +63,11 @@ function readPolicy(policyName) {
     if (!/^[a-z][a-z0-9-]+$/.test(exception.id ?? '')) die('Exception requires exact rule id');
     if (!/^[a-f0-9]{12,64}$/.test(exception.fingerprint ?? '')) die('Exception requires exact fingerprint');
     if (typeof exception.reason !== 'string' || exception.reason.trim().length < 12) die('Exception requires a meaningful reason');
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(exception.expires ?? '') || !Number.isFinite(Date.parse(exception.expires + 'T00:00:00Z'))) die('Exception requires ISO YYYY-MM-DD expiry');
+    const expiryTime = Date.parse(String(exception.expires) + 'T00:00:00Z');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(exception.expires ?? '') || !Number.isFinite(expiryTime) ||
+        new Date(expiryTime).toISOString().slice(0, 10) !== exception.expires) {
+      die('Exception requires a real ISO YYYY-MM-DD expiry');
+    }
     const today = new Date().toISOString().slice(0,10);
     if (exception.expires < today) die('Exception expired: ' + exception.id + '/' + exception.fingerprint);
   }
@@ -126,9 +130,32 @@ function run() {
   }
   const engine = args.engine || process.env.OASDIFF_BIN ||
     (process.platform === 'win32' ? path.join(import.meta.dirname, 'vendor', 'oasdiff.exe') : 'oasdiff');
+  // A comparison must analyze snapshots of the exact bytes used in SHA-256 evidence.
+  // An isolated working directory and clean environment avoid implicit .oasdiff.yaml policy.
+  const resolvedEngine = /[\\/]/.test(engine) ? path.resolve(engine) : engine;
   const env = { ...process.env, NO_COLOR: '1' };
-  const cmd = spawnSync(engine, ['breaking', '--allow-external-refs=false', '--format', 'json', base.file, head.file],
-    { env, encoding: 'utf8', timeout: 45000, maxBuffer: MAX_OUTPUT, windowsHide: true });
+  delete env.OASDIFF_CONFIG;
+  const isolated = fs.mkdtempSync(path.join(os.tmpdir(), 'forgeframe-cg-'));
+  let cmd;
+  let engineVersion = 'unknown';
+  try {
+    const extension = spec => ['.yaml', '.yml', '.json'].includes(path.extname(spec.file).toLowerCase())
+      ? path.extname(spec.file).toLowerCase() : '.yaml';
+    const baseSnapshot = path.join(isolated, 'baseline' + extension(base));
+    const headSnapshot = path.join(isolated, 'revision' + extension(head));
+    fs.writeFileSync(baseSnapshot, base.bytes, { flag: 'wx', mode: 0o600 });
+    fs.writeFileSync(headSnapshot, head.bytes, { flag: 'wx', mode: 0o600 });
+    const versionResult = spawnSync(resolvedEngine, ['--version'], {
+      cwd: isolated, env, encoding: 'utf8', timeout: 5000, maxBuffer: 10000, windowsHide: true
+    });
+    if (!versionResult.error && versionResult.status === 0)
+      engineVersion = cleanText(versionResult.stdout).slice(0, 140);
+    cmd = spawnSync(resolvedEngine,
+      ['breaking', '--allow-external-refs=false', '--format', 'json', baseSnapshot, headSnapshot],
+      { cwd: isolated, env, encoding: 'utf8', timeout: 45000, maxBuffer: MAX_OUTPUT, windowsHide: true });
+  } finally {
+    fs.rmSync(isolated, { recursive: true, force: true });
+  }
   if (cmd.error) die('Engine execution failed: ' + cmd.error.message);
   if (cmd.status !== 0) die('Engine returned error: ' + cleanText(cmd.stderr || cmd.stdout || 'unknown'));
   let findings;
@@ -149,7 +176,7 @@ function run() {
   const blockingCount = processed.filter(f => !f.excepted && LEVEL[f.severity] >= LEVEL[policy.failOn]).length;
   const evidence = {
     schema: 'urn:forgeframe:contract-guard:evidence:v1',
-    generator: { name: 'ForgeFrame Contract Guard', version: VERSION, engine: 'oasdiff' },
+    generator: { name: 'ForgeFrame Contract Guard', version: VERSION, engine: 'oasdiff', engineVersion },
     generatedAt: new Date().toISOString(),
     status: blockingCount ? 'blocked' : 'passed',
     blockingCount,

@@ -1,6 +1,6 @@
 {
   "name": "@forgeframe-labs/contract-guard",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Local OpenAPI change gate with release evidence",
   "main": "index.js",
   "scripts": {
