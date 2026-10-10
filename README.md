@@ -26,6 +26,12 @@ Expected outcome: exit code **0**, zero blocking findings.
 
 Local installation requires Node.js 20.11+ and the oasdiff 1.33.0 binary on PATH, or `OASDIFF_BIN` set to its location. The GitHub Action automatically downloads and checksums its pinned CLI binary.
 
+## Verifiable sample reports
+
+- [Two real breaking findings](examples/breaking/report.json) and [human-readable report](examples/breaking/summary.md).
+- [Safe additive change with zero blockers](examples/safe/report.json).
+- [Evidence reproduction and hash verification](examples/README.md).
+
 ## GitHub Actions
 
 ```yaml
@@ -44,7 +50,7 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: git show "$BASE_SHA:openapi.yaml" > "$RUNNER_TEMP/openapi-base.yaml"
-      - uses: reflectme-source/forgeframe-contract-guard@v0.1.2
+      - uses: reflectme-source/forgeframe-contract-guard@v0.1.3
         with:
           base: ${{ runner.temp }}/openapi-base.yaml
           head: openapi.yaml

@@ -1,0 +1,64 @@
+{
+  "schema": "urn:forgeframe:contract-guard:evidence:v1",
+  "generator": {
+    "name": "ForgeFrame Contract Guard",
+    "version": "0.1.3",
+    "engine": "oasdiff",
+    "engineVersion": "oasdiff version 1.33.0 "
+  },
+  "generatedAt": "2026-10-10T15:02:04.101Z",
+  "status": "blocked",
+  "blockingCount": 2,
+  "inputs": {
+    "base": {
+      "name": "base.yaml",
+      "sha256": "a4fc8ab29241dde21ca37d1a336620c7ad35295d4149953ea69ae9aa0b302a6e"
+    },
+    "head": {
+      "name": "breaking.yaml",
+      "sha256": "b5bf64548df63e290f60d64053c9bf00eceaa2b601ef05bf1d75f0dee40a65cd"
+    }
+  },
+  "policy": {
+    "failOn": "ERR",
+    "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "exceptionCount": 0
+  },
+  "provenance": {
+    "repository": null,
+    "commit": null,
+    "runId": null
+  },
+  "findings": [
+    {
+      "id": "request-parameter-became-required",
+      "fingerprint": "9fd4d4723aa2",
+      "severity": "ERR",
+      "operation": "GET",
+      "path": "/payments",
+      "text": "the `query` request parameter `page` became required",
+      "source": {
+        "line": 12,
+        "column": 11
+      },
+      "excepted": false,
+      "exceptionReason": null,
+      "exceptionExpires": null
+    },
+    {
+      "id": "response-property-enum-value-added",
+      "fingerprint": "35cdd61edd99",
+      "severity": "ERR",
+      "operation": "GET",
+      "path": "/payments",
+      "text": "added the new `chargeback` enum value to the `items/items/status` response property for the response status `200`",
+      "source": {
+        "line": 38,
+        "column": 33
+      },
+      "excepted": false,
+      "exceptionReason": null,
+      "exceptionExpires": null
+    }
+  ]
+}

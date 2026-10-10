@@ -1,0 +1,33 @@
+{
+  "schema": "urn:forgeframe:contract-guard:evidence:v1",
+  "generator": {
+    "name": "ForgeFrame Contract Guard",
+    "version": "0.1.3",
+    "engine": "oasdiff",
+    "engineVersion": "oasdiff version 1.33.0 "
+  },
+  "generatedAt": "2026-10-10T15:01:57.106Z",
+  "status": "passed",
+  "blockingCount": 0,
+  "inputs": {
+    "base": {
+      "name": "base.yaml",
+      "sha256": "a4fc8ab29241dde21ca37d1a336620c7ad35295d4149953ea69ae9aa0b302a6e"
+    },
+    "head": {
+      "name": "safe.yaml",
+      "sha256": "15184af327494ab4ea5762ae638e615f99fb1f2aa3b95db14130232000c8f854"
+    }
+  },
+  "policy": {
+    "failOn": "ERR",
+    "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "exceptionCount": 0
+  },
+  "provenance": {
+    "repository": null,
+    "commit": null,
+    "runId": null
+  },
+  "findings": []
+}

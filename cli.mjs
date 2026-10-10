@@ -10,7 +10,7 @@ import os from 'node:os';
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 
-const VERSION = '0.1.1';
+const VERSION = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url), 'utf8')).version;
 const MAX_INPUT = 5 * 1024 * 1024;
 const MAX_OUTPUT = 16 * 1024 * 1024;
 const LEVEL = Object.freeze({ INFO: 1, WARN: 2, ERR: 3 });
