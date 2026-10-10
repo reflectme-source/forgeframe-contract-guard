@@ -50,18 +50,17 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: git show "$BASE_SHA:openapi.yaml" > "$RUNNER_TEMP/openapi-base.yaml"
-      - uses: reflectme-source/forgeframe-contract-guard@v0.1.3
+      - uses: reflectme-source/forgeframe-contract-guard@47857973aeba8bf5bb6b034544bddaa2be6c8ad5 # v0.1.3
         with:
           base: ${{ runner.temp }}/openapi-base.yaml
           head: openapi.yaml
-          policy: guard.policy.json
           evidence-dir: contract-guard-evidence
-          upload-evidence: 'true'
+          upload-evidence: 'false' # opt in only after reviewing artifact sensitivity
 ```
 
 Replace `openapi.yaml` with your OpenAPI spec path. For production, pin every action to an audited full commit SHA instead of mutable tags, including this action. Do not use `pull_request_target` with untrusted code.
 
-The wrapper defaults to no exceptions, minimum severity `ERR`, and blocks if its engine fails or returns malformed output. It never asks for repository write permissions.
+The wrapper defaults to no exceptions and blocks at severity `ERR`. This example needs no policy file and no repository write permissions. Add a reviewed policy only after committing it. Artifact upload is opt-in.
 
 ## Time-limited exceptions
 
