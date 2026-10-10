@@ -1,4 +1,4 @@
-# ForgeFrame Contract Guard
+﻿# ForgeFrame Contract Guard
 
 **Stop unexpected OpenAPI breaking changes before release. Export evidence your team can review.**
 
@@ -44,7 +44,7 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: git show "$BASE_SHA:openapi.yaml" > "$RUNNER_TEMP/openapi-base.yaml"
-      - uses: reflectme-source/forgeframe-contract-guard@v0.1.0
+      - uses: reflectme-source/forgeframe-contract-guard@v0.1.1
         with:
           base: ${{ runner.temp }}/openapi-base.yaml
           head: openapi.yaml
@@ -93,9 +93,9 @@ Each exception must match both rule ID and exact fingerprint, include a meaningf
 
 See [SECURITY.md](SECURITY.md) for reporting vulnerabilities and trust boundaries.
 
-## Paid service — optional, separate from the open-source Action
+## Paid service â€” optional, separate from the open-source Action
 
-**Contract Guard Setup — $149 per organization (one-time):** remote, asynchronous setup of an OpenAPI baseline, CI gate, policy, review of up to two repositories, and handover of the evidence workflow. No meetings required. Additional scope requires an agreed quote.
+**Contract Guard Setup â€” $149 per organization (one-time):** remote, asynchronous setup of an OpenAPI baseline, CI gate, policy, review of up to two repositories, and handover of the evidence workflow. No meetings required. Additional scope requires an agreed quote.
 
 Contact: **forgeframe.lab@gmail.com** with your repository host, approximate number of specs, and whether they contain external references. We will confirm compatibility and payment options before starting. **There is no online checkout attached to this repository yet; do not send payment to an unverified address.**
 
@@ -118,4 +118,9 @@ Tests cover breaking/non-breaking cases, exceptions, expiry, missing inputs, inv
 
 This wrapper is MIT licensed (see LICENSE). The oasdiff engine is a separate project copyright its authors, licensed Apache-2.0. It is downloaded at runtime rather than committed to this repository. See [oasdiff LICENSE](https://github.com/oasdiff/oasdiff/blob/main/LICENSE).
 
-ForgeFrame Labs • forgeframe.lab@gmail.com
+ForgeFrame Labs â€˘ forgeframe.lab@gmail.com
+
+## Commercial support
+
+ForgeFrame Labs offers implementation, CI integration, compatibility policy design, and evidence workflow customization for teams. To request a scoped paid engagement, contact forgeframe.lab@gmail.com. No subscription, payment entitlement, or hosted dashboard is included with this self-hosted Action. Do not send secrets or private API specifications by email.
+
