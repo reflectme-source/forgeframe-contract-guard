@@ -9,7 +9,7 @@ const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 
 test('release metadata matches the self-hosted GitHub Action distribution',()=>{
   const pkg=JSON.parse(read('package.json'));
-  assert.equal(pkg.version,'0.1.3');
+  assert.equal(pkg.version,'0.1.4');
   assert.equal(pkg.license,'MIT');
   assert.equal(pkg.private,true);
   assert.doesNotMatch(JSON.stringify(pkg),/"main":"index\.js"/);
