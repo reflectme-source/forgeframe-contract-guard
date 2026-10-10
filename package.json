@@ -1,14 +1,19 @@
 {
   "name": "@forgeframe-labs/contract-guard",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Local OpenAPI change gate with release evidence",
-  "main": "index.js",
   "scripts": {
     "test": "node --test"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "openapi",
+    "github-actions",
+    "api-contract",
+    "breaking-changes",
+    "oasdiff"
+  ],
+  "author": "ForgeFrame Labs",
+  "license": "MIT",
   "type": "module",
-  "private": "true"
+  "private": true
 }
