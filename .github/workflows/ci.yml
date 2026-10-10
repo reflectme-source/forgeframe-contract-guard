@@ -1,0 +1,27 @@
+name: Test Contract Guard
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Run own action against safe example
+        uses: ./
+        with:
+          base: fixtures/base.yaml
+          head: fixtures/safe.yaml
+          evidence-dir: evidence/ci
+      - name: Run behavioral tests
+        run: npm test
+      - name: Verify evidence content
+        run: |
+          node -e "const r=require('./evidence/ci/report.json'); if(r.status!=='passed'||r.blockingCount!==0)process.exit(1)"
