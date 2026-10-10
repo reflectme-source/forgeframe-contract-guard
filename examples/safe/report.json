@@ -2,11 +2,11 @@
   "schema": "urn:forgeframe:contract-guard:evidence:v1",
   "generator": {
     "name": "ForgeFrame Contract Guard",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "engine": "oasdiff",
     "engineVersion": "oasdiff version 1.33.0 "
   },
-  "generatedAt": "2026-10-10T15:01:57.106Z",
+  "generatedAt": "2026-10-10T17:48:22.761Z",
   "status": "passed",
   "blockingCount": 0,
   "inputs": {
